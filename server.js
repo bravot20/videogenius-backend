@@ -257,7 +257,8 @@ app.post('/api/ai/generate-script', authenticateToken, async (req, res) => {
   }
 });
 
-// ========== 6 SUBSCRIPTION PLANS ==========
+// ========== 6 SUBSCRIPTION PLANS - UPDATED DURATIONS ==========
+// Free: 3min, Lite: 5min, Plus: 7min, Pro: 10min, Business: 15min, Enterprise: unlimited
 app.get('/api/subscriptions/plans', (req, res) => {
   res.json({
     plans: [
@@ -269,10 +270,11 @@ app.get('/api/subscriptions/plans', (req, res) => {
         features: [
           '3 videos per month',
           '480p video quality',
+          'Up to 3 minutes per video',
           'Basic AI script generation',
           'Community support'
         ],
-        limits: { videosPerMonth: 3, quality: '480p', maxDuration: '30s' }
+        limits: { videosPerMonth: 3, quality: '480p', maxDuration: '3min' }
       },
       {
         id: 'lite',
@@ -286,11 +288,12 @@ app.get('/api/subscriptions/plans', (req, res) => {
         features: [
           '15 videos per month',
           '720p HD video quality',
+          'Up to 5 minutes per video',
           'Standard AI script generation',
           'Email support',
           'Basic analytics'
         ],
-        limits: { videosPerMonth: 15, quality: '720p', maxDuration: '1min' }
+        limits: { videosPerMonth: 15, quality: '720p', maxDuration: '5min' }
       },
       {
         id: 'plus',
@@ -304,12 +307,13 @@ app.get('/api/subscriptions/plans', (req, res) => {
         features: [
           '30 videos per month',
           '720p HD video quality',
+          'Up to 7 minutes per video',
           'Advanced AI script generation',
           'Priority email support',
           'Detailed analytics',
           'Custom thumbnails'
         ],
-        limits: { videosPerMonth: 30, quality: '720p', maxDuration: '2min' }
+        limits: { videosPerMonth: 30, quality: '720p', maxDuration: '7min' }
       },
       {
         id: 'pro',
@@ -323,13 +327,14 @@ app.get('/api/subscriptions/plans', (req, res) => {
         features: [
           '60 videos per month',
           '1080p Full HD quality',
+          'Up to 10 minutes per video',
           'Premium AI script generation',
           'Priority support',
           'Advanced analytics',
           'Custom branding',
           'API access'
         ],
-        limits: { videosPerMonth: 60, quality: '1080p', maxDuration: '5min' }
+        limits: { videosPerMonth: 60, quality: '1080p', maxDuration: '10min' }
       },
       {
         id: 'business',
@@ -343,13 +348,14 @@ app.get('/api/subscriptions/plans', (req, res) => {
         features: [
           'Unlimited videos',
           '1080p Full HD quality',
+          'Up to 15 minutes per video',
           'Premium AI script generation',
           'Priority support + Chat',
           'Team collaboration (3 members)',
           'Full API access',
           'White-label options'
         ],
-        limits: { videosPerMonth: -1, quality: '1080p', maxDuration: '10min' }
+        limits: { videosPerMonth: -1, quality: '1080p', maxDuration: '15min' }
       },
       {
         id: 'enterprise',
@@ -363,6 +369,7 @@ app.get('/api/subscriptions/plans', (req, res) => {
         features: [
           'Unlimited everything',
           '4K Ultra HD quality',
+          'Unlimited video length',
           'Custom AI training',
           'Dedicated account manager',
           'Unlimited team members',
@@ -431,7 +438,15 @@ app.get('/', (req, res) => {
     name: 'VideoGenius API',
     version: '1.0.0',
     status: 'running',
-    plans: 6
+    plans: 6,
+    durations: {
+      free: '3min',
+      lite: '5min',
+      plus: '7min',
+      pro: '10min',
+      business: '15min',
+      enterprise: 'unlimited'
+    }
   });
 });
 
