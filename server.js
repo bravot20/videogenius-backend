@@ -615,6 +615,86 @@ app.get('/api/subscriptions/current', authenticateToken, asyncHandler(async (req
   });
 }));
 
+// ===== ADMIN ROUTES =====
+
+// Admin middleware
+const authenticateAdmin = (req, res, next) => {
+  const adminSecret = req.headers['x-admin-secret'];
+  if (adminSecret !== (process.env.ADMIN_SECRET || 'videogenius-admin-2024')) {
+    return res.status(403).json({ error: 'Unauthorized admin access' });
+  }
+  next();
+};
+
+// Upgrade user plan (admin only)
+app.post('/api/admin/upgrade-user', authenticateAdmin, asyncHandler(async (req, res) => {
+  const { email, plan } = req.body;
+  
+  if (!email || !plan) {
+    return res.status(400).json({ error: 'Email and plan are required' });
+  }
+  
+  const validPlans = ['free', 'lite', 'plus', 'pro', 'business', 'enterprise'];
+  if (!validPlans.includes(plan)) {
+    return res.status(400).json({ error: 'Invalid plan. Valid plans: ' + validPlans.join(', ') });
+  }
+  
+  const user = users.get(email.toLowerCase());
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  // Update user plan
+  const planConfig = PLAN_CONFIG[plan];
+  user.plan = plan;
+  user.videoLimit = planConfig.videosPerMonth;
+  user.upgradedAt = new Date().toISOString();
+  user.upgradedBy = 'admin';
+  
+  // Create subscription record
+  subscriptions.set(user.id, {
+    userId: user.id,
+    plan: plan,
+    status: 'active',
+    currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+    cancelAtPeriodEnd: false,
+    createdAt: new Date().toISOString()
+  });
+  
+  res.json({
+    success: true,
+    message: `User ${email} upgraded to ${plan} plan successfully`,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      plan: user.plan,
+      videoLimit: user.videoLimit,
+      upgradedAt: user.upgradedAt
+    }
+  });
+}));
+
+// Get all users (admin only)
+app.get('/api/admin/users', authenticateAdmin, asyncHandler(async (req, res) => {
+  const allUsers = Array.from(users.values()).map(u => ({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    plan: u.plan,
+    videosCreated: u.videosCreated,
+    videoLimit: u.videoLimit,
+    createdAt: u.createdAt,
+    lastLogin: u.lastLogin
+  }));
+  
+  res.json({
+    success: true,
+    count: allUsers.length,
+    users: allUsers
+  });
+}));
+
 // ===== DASHBOARD STATS =====
 
 app.get('/api/dashboard/stats', authenticateToken, asyncHandler(async (req, res) => {
@@ -682,7 +762,9 @@ app.get('/', (req, res) => {
       '/api/subscriptions/checkout',
       '/api/subscriptions/current',
       '/api/dashboard/stats',
-      '/api/ai/generate-script'
+      '/api/ai/generate-script',
+      '/api/admin/upgrade-user',
+      '/api/admin/users'
     ]
   });
 });
