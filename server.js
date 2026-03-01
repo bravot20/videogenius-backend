@@ -182,7 +182,6 @@ app.post('/api/videos', authenticateToken, async (req, res) => {
     
     videos.set(videoId, video);
     
-    // Simulate progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 15;
@@ -258,7 +257,7 @@ app.post('/api/ai/generate-script', authenticateToken, async (req, res) => {
   }
 });
 
-// Subscription Routes
+// ========== 6 SUBSCRIPTION PLANS ==========
 app.get('/api/subscriptions/plans', (req, res) => {
   res.json({
     plans: [
@@ -267,31 +266,89 @@ app.get('/api/subscriptions/plans', (req, res) => {
         name: 'Free',
         description: 'Get started with AI video generation',
         price: { monthly: 0, yearly: 0 },
-        features: ['3 videos per month', '480p video quality', 'Basic AI script generation', 'Standard support'],
+        features: [
+          '3 videos per month',
+          '480p video quality',
+          'Basic AI script generation',
+          'Community support'
+        ],
         limits: { videosPerMonth: 3, quality: '480p', maxDuration: '30s' }
       },
       {
-        id: 'starter',
-        name: 'Starter',
-        description: 'Perfect for content creators',
-        price: { monthly: 9, yearly: 90 },
+        id: 'lite',
+        name: 'Lite',
+        description: 'Perfect for casual creators',
+        price: { monthly: 7, yearly: 70 },
         priceIds: {
-          monthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
-          yearly: process.env.STRIPE_PRICE_STARTER_YEARLY || ''
+          monthly: process.env.STRIPE_PRICE_LITE_MONTHLY || '',
+          yearly: process.env.STRIPE_PRICE_LITE_YEARLY || ''
         },
-        features: ['10 videos per month', '720p HD video quality', 'Advanced AI script generation', 'Priority support', 'Custom branding'],
-        limits: { videosPerMonth: 10, quality: '720p', maxDuration: '2min' }
+        features: [
+          '15 videos per month',
+          '720p HD video quality',
+          'Standard AI script generation',
+          'Email support',
+          'Basic analytics'
+        ],
+        limits: { videosPerMonth: 15, quality: '720p', maxDuration: '1min' }
+      },
+      {
+        id: 'plus',
+        name: 'Plus',
+        description: 'For growing content creators',
+        price: { monthly: 15, yearly: 150 },
+        priceIds: {
+          monthly: process.env.STRIPE_PRICE_PLUS_MONTHLY || '',
+          yearly: process.env.STRIPE_PRICE_PLUS_YEARLY || ''
+        },
+        features: [
+          '30 videos per month',
+          '720p HD video quality',
+          'Advanced AI script generation',
+          'Priority email support',
+          'Detailed analytics',
+          'Custom thumbnails'
+        ],
+        limits: { videosPerMonth: 30, quality: '720p', maxDuration: '2min' }
       },
       {
         id: 'pro',
         name: 'Pro',
-        description: 'For serious creators and businesses',
+        description: 'For serious creators and influencers',
         price: { monthly: 29, yearly: 290 },
         priceIds: {
           monthly: process.env.STRIPE_PRICE_PRO_MONTHLY || '',
           yearly: process.env.STRIPE_PRICE_PRO_YEARLY || ''
         },
-        features: ['Unlimited videos', '1080p Full HD quality', 'Premium AI script generation', 'Priority support', 'Custom branding', 'API access', 'Team collaboration'],
+        features: [
+          '60 videos per month',
+          '1080p Full HD quality',
+          'Premium AI script generation',
+          'Priority support',
+          'Advanced analytics',
+          'Custom branding',
+          'API access'
+        ],
+        limits: { videosPerMonth: 60, quality: '1080p', maxDuration: '5min' }
+      },
+      {
+        id: 'business',
+        name: 'Business',
+        description: 'For teams and small agencies',
+        price: { monthly: 59, yearly: 590 },
+        priceIds: {
+          monthly: process.env.STRIPE_PRICE_BUSINESS_MONTHLY || '',
+          yearly: process.env.STRIPE_PRICE_BUSINESS_YEARLY || ''
+        },
+        features: [
+          'Unlimited videos',
+          '1080p Full HD quality',
+          'Premium AI script generation',
+          'Priority support + Chat',
+          'Team collaboration (3 members)',
+          'Full API access',
+          'White-label options'
+        ],
         limits: { videosPerMonth: -1, quality: '1080p', maxDuration: '10min' }
       },
       {
@@ -299,7 +356,20 @@ app.get('/api/subscriptions/plans', (req, res) => {
         name: 'Enterprise',
         description: 'For large teams and agencies',
         price: { monthly: 99, yearly: 990 },
-        features: ['Unlimited everything', '4K Ultra HD quality', 'Custom AI training', 'Dedicated account manager', 'White-label options', 'Full API access', 'SSO & advanced security'],
+        priceIds: {
+          monthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || '',
+          yearly: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY || ''
+        },
+        features: [
+          'Unlimited everything',
+          '4K Ultra HD quality',
+          'Custom AI training',
+          'Dedicated account manager',
+          'Unlimited team members',
+          'Full white-label solution',
+          'SSO & advanced security',
+          'Custom integrations'
+        ],
         limits: { videosPerMonth: -1, quality: '4K', maxDuration: 'unlimited' }
       }
     ]
@@ -360,7 +430,8 @@ app.get('/', (req, res) => {
   res.json({
     name: 'VideoGenius API',
     version: '1.0.0',
-    status: 'running'
+    status: 'running',
+    plans: 6
   });
 });
 
